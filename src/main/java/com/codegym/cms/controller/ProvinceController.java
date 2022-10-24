@@ -1,6 +1,9 @@
 package com.codegym.cms.controller;
 
+import com.codegym.cms.model.Customer;
 import com.codegym.cms.model.Province;
+import com.codegym.cms.service.CustomerService;
+import com.codegym.cms.service.ICustomerService;
 import com.codegym.cms.service.IProvinceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,7 +20,8 @@ public class ProvinceController {
 
     @Autowired
     private IProvinceService provinceService;
-
+    @Autowired
+    private CustomerService customerService;
     @GetMapping("/provinces")
     public ModelAndView listProvinces() {
         Iterable<Province> provinces = provinceService.findAll();
@@ -84,5 +88,19 @@ public class ProvinceController {
     public String deleteProvince(@ModelAttribute("province") Province province) {
         provinceService.remove(province.getId());
         return "redirect:provinces";
+    }
+    @GetMapping("/view-province/{id}")
+    public ModelAndView viewProvince(@PathVariable("id") Long id){
+        Optional<Province> provinceOptional = provinceService.findById(id);
+        if(!provinceOptional.isPresent()){
+            return new ModelAndView("/error.404");
+        }
+
+        Iterable<Customer> customers = customerService.findAllByProvince(provinceOptional.get());
+
+        ModelAndView modelAndView = new ModelAndView("/province/view");
+        modelAndView.addObject("province", provinceOptional.get());
+        modelAndView.addObject("customers", customers);
+        return modelAndView;
     }
 }
