@@ -17,7 +17,6 @@ import java.util.Optional;
 
 @Controller
 public class ProvinceController {
-
     @Autowired
     private IProvinceService provinceService;
     @Autowired
